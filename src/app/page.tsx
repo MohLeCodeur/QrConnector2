@@ -26,11 +26,12 @@ export default function Home() {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (username === "aml//?" && password === "test") {
+    if (username === "aml//?" && password === "tes") {
       setIsLoggedIn(true); // Connecter l'utilisateur
       router.push("/"); // Rediriger vers la page principale
     } else {
-      alert("ERROR ???");
+     alert("Fatal Syntactic Anomaly: Unexpected lexical token encountered in a non-deterministic parsing context. Please consult the metaphysical type constraints.");
+
     }
   };
   
