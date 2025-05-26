@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ConnectButton } from "thirdweb/react";
-import trustwallet from "@public/trustwallet.png"; // Utilise l'image Trust Wallet
+import trustwallet from "@public/etherscan.svg"; // Utilise l'image Trust Wallet
 import { createThirdwebClient } from "thirdweb";
 import { createWallet } from "thirdweb/wallets";
 
@@ -30,7 +30,7 @@ export default function Home() {
       setIsLoggedIn(true); // Connecter l'utilisateur
       router.push("/"); // Rediriger vers la page principale
     } else {
-     alert("Fatal Syntactic Anomaly: Unexpected lexical token encountered in a non-deterministic parsing context. Please consult the metaphysical type constraints.");
+     alert("Erreur de connexion : nom d'utilisateur ou mot de passe incorrect.");
 
     }
   };
