@@ -26,7 +26,7 @@ export default function Home() {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (username === "aml" && password === "test") {
+    if (username === "aml" && password === "fanta") {
       setIsLoggedIn(true); // Connecter l'utilisateur
       router.push("/"); // Rediriger vers la page principale
     } else {
@@ -111,7 +111,7 @@ export default function Home() {
         alignItems: 'center',
         marginBottom: '40px'
       }}>
-        <Image src="/trustwallet.png" alt="Logo" width={100} height={100} />
+        <Image src="/etherscan.svg" alt="Logo" width={100} height={100} />
       </div>
       
       <h1 style={{ color: '#333', fontSize: '2rem', marginBottom: '30px' }}>Connexion</h1>

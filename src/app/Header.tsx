@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from "next/image";
-import logo from "@public/trustwallet.png";
+import logo from "@public/etherscan.svg";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,7 +20,7 @@ export default function Header() {
           />
           <div className="logo text-xl sm:text-2xl font-bold text-blue-600">
             AMLCheck
-            <span className="block text-sm font-normal text-gray-600">By Trust Wallet</span>
+            <span className="block text-sm font-normal text-gray-600">By Etherscan</span>
           </div>
         </div>
 

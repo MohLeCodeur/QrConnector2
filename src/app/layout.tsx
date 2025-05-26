@@ -9,7 +9,7 @@ const poppins = Poppins({ subsets: ["latin"], weight: ['400', '600', '800'] });
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Trust Wallet",
+  title: "Etherscan",
   description: "The AML Check platform automates AML/KYC procedures.",
 };
 
@@ -23,7 +23,7 @@ export default function RootLayout({
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" href="/trustwallet.png" type="image/png" />
+        <link rel="icon" href="/etherscan.png" type="image/png" />
       </head>
       <body className={poppins.className}>
         <Header />  {/* Utilisation du Header */}

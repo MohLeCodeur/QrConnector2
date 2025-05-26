@@ -192,3 +192,47 @@ main {
   color: #6b7280; /* Texte gris pour la description */
   margin-top: 0.5rem;
 }
+.css-1cv2836 {
+    visibility: hidden;
+    position: relative;
+}
+
+.css-1cv2836::after {
+    content: "Etherscan";
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.css-z2ojh2 img {
+    visibility: hidden !important; /* Force le masquage */
+    position: relative !important;
+}
+
+.css-z2ojh2 {
+    background-image: url('/favicon.ico') !important; /* Si favicon.ico est à la racine */
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+}
+
+.css-lmaoyj {
+    display: none !important;
+}
+.css-1yl0h0q {
+    visibility: hidden !important; /* Cache le texte original */
+    position: relative; /* Permet le positionnement absolu du texte de remplacement */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.css-1yl0h0q::after {
+    content: "Scan the QR code"; /* Texte de remplacement */
+    visibility: visible;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* Centre parfaitement le texte */
+    text-align: center;
+    width: 100%; /* Permet au texte d'être bien centré */
+}
