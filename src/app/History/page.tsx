@@ -5,14 +5,14 @@ export default function HistoryPage() {
   const { connectionHistory, loading } = useConnection();
 
   if (loading) {
-    return <div className="text-center p-8">Chargement historique...</div>;
+    return <div className="text-center p-8">Loading history...</div>;
   }
 
   return (
     <div className="connection-history-section py-20 bg-white text-center">
       <div className="container mx-auto">
         <h2 className="text-4xl font-extrabold mb-8 text-blue-600">
-          Historique Connexions
+          Connection History
         </h2>
         <div className="grid grid-cols-1 gap-4 max-w-2xl mx-auto">
           {connectionHistory.map((entry, index) => (
@@ -24,7 +24,7 @@ export default function HistoryPage() {
                 {entry.ethAddress && (
                   <>
                     <br />
-                    Adresse: <span className="font-mono">{entry.ethAddress}</span>
+                    Address: <span className="font-mono">{entry.ethAddress}</span>
                   </>
                 )}
               </p>

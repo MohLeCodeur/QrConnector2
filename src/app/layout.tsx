@@ -1,16 +1,16 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google"; // Poppins déjà importé
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
-import Header from "./Header"; // Assurez-vous que ce chemin est correct
-import { ConnectionProvider } from "@/context/ConnectionContext"; // Importer ConnectionProvider
+import Header from "./Header"; 
+// ASSUREZ-VOUS QUE LE NOM DU FICHIER EST CORRECT (ConnectionContext ou ConnexionContext)
+import { ConnectionProvider } from "@/context/ConnectionContext"; 
 
 const poppins = Poppins({ subsets: ["latin"], weight: ['400', '600', '800'] });
-// const inter = Inter({ subsets: ["latin"] }); // Vous utilisez poppins, inter n'est pas utilisé pour le body
 
 export const metadata: Metadata = {
-  title: "Etherscan AML Check", // Titre mis à jour
+  title: "Etherscan AML Check",
   description: "The AML Check platform automates AML/KYC procedures.",
 };
 
@@ -27,12 +27,11 @@ export default function RootLayout({
         <link rel="icon" href="/etherscan.png" type="image/png" />
       </head>
       <body className={poppins.className}>
-        <ConnectionProvider> {/* Envelopper avec ConnectionProvider */}
-          <Header />
+        <ConnectionProvider> 
+          <Header /> 
           <ThirdwebProvider>
-            <main className="pt-4"> {/* Ajout d'un peu de padding pour le contenu sous le header sticky */}
-              {children}
-            </main>
+            {/* PAS DE <main> ici pour l'instant, laissons page.tsx gérer sa propre structure principale */}
+            {children} 
           </ThirdwebProvider>
         </ConnectionProvider>
       </body>
