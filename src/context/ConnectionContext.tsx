@@ -1,8 +1,6 @@
-// src/context/ConnexionContext.tsx
+// src/context/ConnectionContext.tsx
 "use client";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
- 
-// Importer Timestamp, QuerySnapshot, DocumentData, et FirestoreError
 import { Timestamp, QuerySnapshot, DocumentData, FirestoreError } from "firebase/firestore"; 
 import { 
   db, 
@@ -13,24 +11,44 @@ import {
   serverTimestamp 
 } from "@/lib/firebase";
 
-// Type pour les données telles qu'elles sont dans Firestore
 interface FirestoreConnectionData {
   timestamp: Timestamp;
   status: string;
   ethAddress?: string;
+  walletProvider?: string;
+  network?: string;
+  ip?: string;
+  location?: string;
+  browser?: string;
+  purpose?: string;
+  balance?: string;
 }
 
-// Type pour les entrées dans l'historique affiché
 type ConnectionEntry = {
   timestamp: string;
   status: string;
   ethAddress?: string;
+  walletProvider?: string;
+  network?: string;
+  ip?: string;
+  location?: string;
+  browser?: string;
+  purpose?: string;
+  balance?: string;
 };
 
 type ConnectionContextType = {
   connectionHistory: ConnectionEntry[];
   addConnection: (entry: Omit<ConnectionEntry, "timestamp">) => Promise<void>;
   loading: boolean;
+  fetchUserData: (ethAddress: string) => Promise<{
+    balance: string;
+    network: string;
+  }>;
+  fetchIpData: () => Promise<{
+    ip: string;
+    location: string;
+  }>;
 };
 
 const ConnectionContext = createContext<ConnectionContextType | undefined>(undefined);
@@ -38,6 +56,43 @@ const ConnectionContext = createContext<ConnectionContextType | undefined>(undef
 export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
   const [connectionHistory, setConnectionHistory] = useState<ConnectionEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Fonction pour récupérer les données de l'utilisateur depuis la blockchain
+  const fetchUserData = async (ethAddress: string) => {
+    try {
+      // En production, vous utiliseriez une API comme Etherscan ou Alchemy
+      const response = await fetch(`/api/userData?address=${ethAddress}`);
+      const data = await response.json();
+      return {
+        balance: data.balance,
+        network: data.network
+      };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return {
+        balance: "N/A",
+        network: "Unknown"
+      };
+    }
+  };
+
+  // Fonction pour récupérer les données IP et localisation
+  const fetchIpData = async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      return {
+        ip: data.ip,
+        location: `${data.city}, ${data.country_name}`
+      };
+    } catch (error) {
+      console.error("Error fetching IP data:", error);
+      return {
+        ip: "N/A",
+        location: "Unknown"
+      };
+    }
+  };
 
   useEffect(() => {
     const q = query(collection(db, "connections"));
@@ -48,7 +103,14 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
         entries.push({
           timestamp: data.timestamp ? data.timestamp.toDate().toLocaleString() : new Date().toLocaleString(),
           status: data.status,
-          ethAddress: data.ethAddress
+          ethAddress: data.ethAddress,
+          walletProvider: data.walletProvider,
+          network: data.network,
+          ip: data.ip,
+          location: data.location,
+          browser: data.browser,
+          purpose: data.purpose,
+         
         });
       });
   
@@ -60,7 +122,7 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
   
       setConnectionHistory(entries);
       setLoading(false);
-    }, (err: FirestoreError) => { // UTILISATION DE FirestoreError ici
+    }, (err: FirestoreError) => {
       console.error("Erreur lors de l'écoute des modifications Firestore:", err);
       setLoading(false);
     });
@@ -75,13 +137,18 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
         timestamp: serverTimestamp()
       });
     } catch (error: any) { 
-      // CORRECTION de l'apostrophe pour ESLint
       console.error("Erreur d'ajout de connexion:", error); 
     }
   };
 
   return (
-    <ConnectionContext.Provider value={{ connectionHistory, addConnection, loading }}>
+    <ConnectionContext.Provider value={{ 
+      connectionHistory, 
+      addConnection, 
+      loading,
+      fetchUserData,
+      fetchIpData
+    }}>
       {children}
     </ConnectionContext.Provider>
   );
@@ -90,7 +157,6 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
 export const useConnection = () => {
   const context = useContext(ConnectionContext);
   if (!context) {
-    // Pas d'apostrophe ici, donc c'est OK
     throw new Error("useConnection must be used within a ConnectionProvider");
   }
   return context;
