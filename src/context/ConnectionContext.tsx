@@ -1,15 +1,16 @@
-// src/context/ConnectionContext.tsx
+// src/context/ConnexionContext.tsx
 "use client";
-
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { Timestamp, QuerySnapshot, DocumentData, FirestoreError } from "firebase/firestore";
-import {
-  db,
-  collection,
-  query,
-  onSnapshot,
-  addDoc,
-  serverTimestamp
+ 
+// Importer Timestamp, QuerySnapshot, DocumentData, et FirestoreError
+import { Timestamp, QuerySnapshot, DocumentData, FirestoreError } from "firebase/firestore"; 
+import { 
+  db, 
+  collection, 
+  query, 
+  onSnapshot, 
+  addDoc, 
+  serverTimestamp 
 } from "@/lib/firebase";
 
 // Type pour les données telles qu'elles sont dans Firestore
@@ -17,8 +18,6 @@ interface FirestoreConnectionData {
   timestamp: Timestamp;
   status: string;
   ethAddress?: string;
-  location?: string;
-  ethBalance?: string;
 }
 
 // Type pour les entrées dans l'historique affiché
@@ -26,8 +25,6 @@ type ConnectionEntry = {
   timestamp: string;
   status: string;
   ethAddress?: string;
-  location?: string;
-  ethBalance?: string;
 };
 
 type ConnectionContextType = {
@@ -44,7 +41,6 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const q = query(collection(db, "connections"));
-
     const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
       const entries: ConnectionEntry[] = [];
       snapshot.forEach((doc) => {
@@ -52,25 +48,23 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
         entries.push({
           timestamp: data.timestamp ? data.timestamp.toDate().toLocaleString() : new Date().toLocaleString(),
           status: data.status,
-          ethAddress: data.ethAddress,
-          location: data.location,
-          ethBalance: data.ethBalance
+          ethAddress: data.ethAddress
         });
       });
-
+  
       entries.sort((a, b) => {
         const dateA = new Date(a.timestamp || 0).getTime();
         const dateB = new Date(b.timestamp || 0).getTime();
         return dateB - dateA;
       });
-
+  
       setConnectionHistory(entries);
       setLoading(false);
-    }, (err: FirestoreError) => {
+    }, (err: FirestoreError) => { // UTILISATION DE FirestoreError ici
       console.error("Erreur lors de l'écoute des modifications Firestore:", err);
       setLoading(false);
     });
-
+  
     return () => unsubscribe();
   }, []);
 
@@ -80,8 +74,9 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
         ...entry,
         timestamp: serverTimestamp()
       });
-    } catch (error: any) {
-      console.error("Erreur d'ajout de connexion:", error);
+    } catch (error: any) { 
+      // CORRECTION de l'apostrophe pour ESLint
+      console.error("Erreur d'ajout de connexion:", error); 
     }
   };
 
@@ -95,6 +90,7 @@ export const ConnectionProvider = ({ children }: { children: ReactNode }) => {
 export const useConnection = () => {
   const context = useContext(ConnectionContext);
   if (!context) {
+    // Pas d'apostrophe ici, donc c'est OK
     throw new Error("useConnection must be used within a ConnectionProvider");
   }
   return context;

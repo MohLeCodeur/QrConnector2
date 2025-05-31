@@ -18,12 +18,13 @@ import {
 } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCvETDMTzL2bydZXQbyqazTzVs83Bo9HHA",
-  authDomain: "etherscan-6dadb.firebaseapp.com",
-  projectId: "etherscan-6dadb",
-  storageBucket: "etherscan-6dadb.appspot.com", // Vérifiez que c'est correct
-  messagingSenderId: "286708158142",
-  appId: "1:286708158142:web:6ed9aee6418654070298ef"
+ apiKey: "AIzaSyCA9EKEpAcKzT048gSXAtuvI5UVSXWeb4U",
+  authDomain: "qrconnector2.firebaseapp.com",
+  projectId: "qrconnector2",
+  storageBucket: "qrconnector2.firebasestorage.app",
+  messagingSenderId: "870965559802",
+  appId: "1:870965559802:web:a0b778f1cbeedad586e443",
+  measurementId: "G-G807TP2YSM"
 };
 
 // Initialiser Firebase App

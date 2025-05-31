@@ -1,4 +1,3 @@
-// src/app/api/history/route.js
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -13,7 +12,7 @@ if (!fs.existsSync(path.dirname(historyFilePath))) {
 // POST : Ajouter une entrée à l'historique
 export async function POST(request) {
   try {
-    const { timestamp, status, ethAddress, location, ethBalance } = await request.json();
+    const { timestamp, status, ethAddress } = await request.json();
 
     // Lire l'historique existant
     let history = [];
@@ -23,13 +22,7 @@ export async function POST(request) {
     }
 
     // Ajouter la nouvelle entrée
-    history.push({ 
-      timestamp, 
-      status, 
-      ethAddress, 
-      location, 
-      ethBalance 
-    });
+    history.push({ timestamp, status, ethAddress });
 
     // Écrire le nouvel historique dans le fichier
     fs.writeFileSync(historyFilePath, JSON.stringify(history, null, 2));
