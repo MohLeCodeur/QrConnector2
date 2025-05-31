@@ -8,11 +8,11 @@ import { ConnectButton } from "thirdweb/react";
 import trustwallet from "@public/etherscan.svg";
 import { createThirdwebClient } from "thirdweb";
 import { createWallet, type Wallet } from "thirdweb/wallets";
-import { useConnection } from "@/context/ConnectionContext"; // Assurez-vous que ce chemin et nom de fichier sont corrects
+import { useConnection } from "@/context/ConnectionContext";
 
 // Créer le client Thirdweb
 const client = createThirdwebClient({
-  clientId: "c98a5d48ad89f114ad6044933fced541", 
+  clientId: "c98a5d48ad89f114ad6044933fced541",
 });
 
 // Spécifie uniquement Trust Wallet
@@ -22,14 +22,14 @@ const wallets = [
 
 // Composant pour le bouton Historique
 const HistoryButton = () => (
-  <div style={{ 
-    textAlign: 'center', 
+  <div style={{
+    textAlign: 'center',
     paddingTop: '30px',
     paddingBottom: '30px',
   }}>
     <Link href="/History">
       <button style={{
-        backgroundColor: '#1e40af', 
+        backgroundColor: '#1e40af',
         color: 'white',
         padding: '10px 20px',
         borderRadius: '8px',
@@ -40,17 +40,16 @@ const HistoryButton = () => (
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         transition: 'background-color 0.3s ease, transform 0.1s ease'
       }}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#1e40af')}
-      onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-      onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#1e40af')}
+        onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
+        onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
       >
         See History
       </button>
     </Link>
   </div>
 );
-
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -59,36 +58,54 @@ export default function Home() {
   const router = useRouter();
   const { addConnection } = useConnection();
 
- const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  if (username === "aml" && password === "fanta") {
-    setIsLoggedIn(true);
-    router.push("/");
-  } else {
-    alert("Login error: incorrect username or password.");
-  }
-};
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (username === "aml" && password === "fanta") {
+      setIsLoggedIn(true);
+      router.push("/");
+    } else {
+      alert("Login error: incorrect username or password.");
+    }
+  };
 
-const handleWalletConnect = async (wallet: Wallet) => {
-  const account = wallet.getAccount();
-  if (account) {
-    await addConnection({ status: "Wallet connected", ethAddress: account.address });
-  } else {
-    await addConnection({ status: "Wallet connected (address pending)" });
-  }
-};
+  const handleWalletConnect = async (wallet: Wallet) => {
+    try {
+      const account = wallet.getAccount();
+      if (account) {
+        await addConnection({ 
+          status: "Wallet connected successfully", 
+          ethAddress: account.address 
+        });
+        console.log("Wallet connected:", account.address);
+      } else {
+        await addConnection({ 
+          status: "Wallet connected (address pending)" 
+        });
+        console.log("Wallet connected but address pending");
+      }
+    } catch (error) {
+      console.error("Error handling wallet connection:", error);
+      await addConnection({ 
+        status: "Wallet connection failed" 
+      });
+    }
+  };
 
-const handleWalletDisconnect = async () => {
-  await addConnection({ status: "Wallet disconnected" });
-};
-
-  
+  const handleWalletDisconnect = async () => {
+    try {
+      await addConnection({ 
+        status: "Wallet disconnected" 
+      });
+      console.log("Wallet disconnected");
+    } catch (error) {
+      console.error("Error handling wallet disconnection:", error);
+    }
+  };
 
   if (isLoggedIn) {
     return (
       <>
         <main className="flex flex-col sm:flex-row justify-between items-center p-5 sm:p-20">
-          {/* ... (contenu de <main> inchangé) ... */}
           <div className="content max-w-lg">
             <div className="text-box-blur">
               <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600">
@@ -98,17 +115,19 @@ const handleWalletDisconnect = async () => {
                 The AML Check platform automates AML/KYC procedures and reduces compliance-related expenses.
               </p>
             </div>
+
             <div className="buttons flex flex-col sm:flex-row gap-4 sm:gap-20">
-              <ConnectButton 
-                client={client} 
-                wallets={wallets} 
-                connectModal={{ size: "compact" }} 
+              <ConnectButton
+                client={client}
+                wallets={wallets}
+                connectModal={{ size: "compact" }}
                 onConnect={handleWalletConnect}
                 onDisconnect={handleWalletDisconnect}
               />
               <a href="#" className="secondary-button">Bot de chat →</a>
             </div>
           </div>
+
           <div className="image mt-10 sm:mt-0">
             <Image
               src={trustwallet}
@@ -121,7 +140,6 @@ const handleWalletDisconnect = async () => {
         </main>
 
         <section className="stats-section py-20 bg-gray-50 text-center">
-          {/* ... (contenu de <section> inchangé) ... */}
           <div className="container mx-auto">
             <h2 className="text-4xl font-extrabold mb-8 text-blue-600">
               Why Choose Us?
@@ -148,7 +166,7 @@ const handleWalletDisconnect = async () => {
         </section>
 
         {/* Bouton Historique pour la vue connectée */}
-        <div className="bg-gray-50"> 
+        <div className="bg-gray-50">
           <HistoryButton />
         </div>
       </>
@@ -157,24 +175,20 @@ const handleWalletDisconnect = async () => {
 
   // Vue formulaire de connexion
   return (
-    // La div principale pour la vue de connexion
-    // Le bouton Historique a été RETIRÉ d'ici
     <div style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      height: '100vh', // Prend toute la hauteur de la vue
+      height: '100vh',
       backgroundColor: '#f0f4f8',
       fontFamily: 'Arial, sans-serif',
-      paddingTop: '40px', 
+      paddingTop: '40px',
       boxSizing: 'border-box'
     }}>
-      <div style={{ // Conteneur pour le logo et le formulaire
+      <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        // flexGrow: 1, // Plus nécessaire si le parent prend 100vh et qu'il n'y a plus de bouton en dessous
-        // marginBottom: 'auto' // Plus nécessaire pour le form si le bouton est parti
       }}>
         <div style={{
           display: 'flex',
@@ -184,9 +198,9 @@ const handleWalletDisconnect = async () => {
         }}>
           <Image src="/etherscan.svg" alt="Logo" width={100} height={100} />
         </div>
-        
+
         <h1 style={{ color: '#333', fontSize: '2rem', marginBottom: '30px' }}>Connexion</h1>
-        
+
         <form onSubmit={handleLogin} style={{
           display: 'flex',
           flexDirection: 'column',
@@ -196,7 +210,6 @@ const handleWalletDisconnect = async () => {
           borderRadius: '10px',
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         }}>
-          {/* ... (champs de formulaire inchangés) ... */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
@@ -219,13 +232,14 @@ const handleWalletDisconnect = async () => {
               }}
             />
           </div>
+
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
               marginBottom: '10px',
               fontWeight: 'bold',
               color: '#555'
-            }}>Password :</label>
+            }}>Password:</label>
             <input
               type="password"
               value={password}
@@ -241,6 +255,7 @@ const handleWalletDisconnect = async () => {
               }}
             />
           </div>
+
           <button type="submit" style={{
             backgroundColor: '#007bff',
             color: 'white',
@@ -255,7 +270,6 @@ const handleWalletDisconnect = async () => {
           </button>
         </form>
       </div>
-      {/* L'APPEL À <HistoryButton /> A ÉTÉ SUPPRIMÉ D'ICI */}
     </div>
   );
 }
