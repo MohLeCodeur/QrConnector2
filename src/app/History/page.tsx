@@ -1,5 +1,6 @@
 // src/app/History/page.tsx
 "use client";
+
 import { useConnection } from "@/context/ConnectionContext";
 
 export default function HistoryPage() {
@@ -17,43 +18,58 @@ export default function HistoryPage() {
         </h2>
         <div className="grid grid-cols-1 gap-4 max-w-4xl mx-auto">
           {connectionHistory.map((entry, index) => (
-            <div key={index} className="history-item p-6 bg-gray-100 rounded-lg mb-4 shadow-sm">
+            <div key={index} className="history-item p-6 bg-gray-100 rounded-lg mb-4 shadow-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                 <div>
-                  <p className="font-semibold text-gray-800">Timestamp:</p>
-                  <p className="text-gray-600 mb-2">{entry.timestamp}</p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold text-blue-600">Timestamp:</span>
+                    <br />
+                    <span className="text-sm">{entry.timestamp}</span>
+                  </p>
                   
-                  <p className="font-semibold text-gray-800">Status:</p>
-                  <p className="text-gray-600 mb-2">{entry.status}</p>
-                  
-                  {entry.ethAddress && (
-                    <>
-                      <p className="font-semibold text-gray-800">ETH Address:</p>
-                      <p className="text-gray-600 font-mono mb-2">{entry.ethAddress}</p>
-                    </>
-                  )}
-                  
-                  <p className="font-semibold text-gray-800">Wallet Provider:</p>
-                  <p className="text-gray-600 mb-2">{entry.walletProvider || "N/A"}</p>
+                  <p className="text-gray-700 mt-3">
+                    <span className="font-semibold text-blue-600">Status:</span>
+                    <br />
+                    <span className={`px-2 py-1 rounded text-sm ${
+                      entry.status.includes('connected') && !entry.status.includes('disconnected') 
+                        ? 'bg-green-100 text-green-800' 
+                        : entry.status.includes('disconnected')
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {entry.status}
+                    </span>
+                  </p>
                 </div>
-                
+
                 <div>
-                  <p className="font-semibold text-gray-800">Network:</p>
-                  <p className="text-gray-600 mb-2">{entry.network || "N/A"}</p>
-                  
-                  <p className="font-semibold text-gray-800">IP Address:</p>
-                  <p className="text-gray-600 mb-2">{entry.ip || "N/A"}</p>
-                  
-                  <p className="font-semibold text-gray-800">Location:</p>
-                  <p className="text-gray-600 mb-2">{entry.location || "N/A"}</p>
-                  
-                  <p className="font-semibold text-gray-800">Browser:</p>
-                  <p className="text-gray-600 mb-2">{entry.browser || "N/A"}</p>
-                  
-                  <p className="font-semibold text-gray-800">Purpose:</p>
-                  <p className="text-gray-600 mb-2">{entry.purpose || "N/A"}</p>
-                  
-               
+                  {entry.ethAddress && (
+                    <p className="text-gray-700 mb-3">
+                      <span className="font-semibold text-blue-600">ETH Address:</span>
+                      <br />
+                      <span className="font-mono text-sm break-all bg-gray-200 px-2 py-1 rounded">
+                        {entry.ethAddress}
+                      </span>
+                    </p>
+                  )}
+
+                  {entry.location && (
+                    <p className="text-gray-700 mb-3">
+                      <span className="font-semibold text-blue-600">Location:</span>
+                      <br />
+                      <span className="text-sm">{entry.location}</span>
+                    </p>
+                  )}
+
+                  {entry.ethBalance && (
+                    <p className="text-gray-700">
+                      <span className="font-semibold text-blue-600">ETH Balance:</span>
+                      <br />
+                      <span className="text-sm font-mono bg-blue-100 px-2 py-1 rounded">
+                        {entry.ethBalance}
+                      </span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

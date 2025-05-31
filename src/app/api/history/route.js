@@ -5,44 +5,33 @@ import path from 'path';
 
 const historyFilePath = path.join(process.cwd(), 'data', 'history.json');
 
+// Créez le dossier `data` s'il n'existe pas
 if (!fs.existsSync(path.dirname(historyFilePath))) {
   fs.mkdirSync(path.dirname(historyFilePath), { recursive: true });
 }
 
+// POST : Ajouter une entrée à l'historique
 export async function POST(request) {
   try {
-    const { 
-      timestamp, 
-      status, 
-      ethAddress,
-      walletProvider,
-      network,
-      ip,
-      location,
-      browser,
-      purpose,
-      balance
-    } = await request.json();
+    const { timestamp, status, ethAddress, location, ethBalance } = await request.json();
 
+    // Lire l'historique existant
     let history = [];
     if (fs.existsSync(historyFilePath)) {
       const fileData = fs.readFileSync(historyFilePath, 'utf8');
       history = JSON.parse(fileData);
     }
 
+    // Ajouter la nouvelle entrée
     history.push({ 
       timestamp, 
       status, 
-      ethAddress,
-      walletProvider,
-      network,
-      ip,
-      location,
-      browser,
-      purpose,
-      balance
+      ethAddress, 
+      location, 
+      ethBalance 
     });
 
+    // Écrire le nouvel historique dans le fichier
     fs.writeFileSync(historyFilePath, JSON.stringify(history, null, 2));
 
     return NextResponse.json({ message: 'History updated', history });
@@ -52,8 +41,10 @@ export async function POST(request) {
   }
 }
 
+// GET : Récupérer l'historique
 export async function GET() {
   try {
+    // Lire et renvoyer l'historique
     let history = [];
     if (fs.existsSync(historyFilePath)) {
       const fileData = fs.readFileSync(historyFilePath, 'utf8');
