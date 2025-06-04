@@ -9,6 +9,7 @@ import trustwallet from "@public/etherscan.svg";
 import { createThirdwebClient } from "thirdweb";
 import { createWallet, type Wallet } from "thirdweb/wallets";
 import { useConnection } from "@/context/ConnectionContext";
+import TermsModal from "@/components/TermsModal";
 
 // Créer le client Thirdweb
 const client = createThirdwebClient({
@@ -28,18 +29,19 @@ const HistoryButton = () => (
     paddingBottom: '30px',
   }}>
     <Link href="/History">
-      <button style={{
-        backgroundColor: '#1e40af',
-        color: 'white',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        border: 'none',
-        fontSize: '15px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        transition: 'background-color 0.3s ease, transform 0.1s ease'
-      }}
+      <button
+        style={{
+          backgroundColor: '#1e40af',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          border: 'none',
+          fontSize: '15px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          transition: 'background-color 0.3s ease, transform 0.1s ease'
+        }}
         onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
         onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#1e40af')}
         onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
@@ -55,6 +57,10 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [connectedWalletAddress, setConnectedWalletAddress] = useState<string>('');
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const router = useRouter();
   const { addConnection } = useConnection();
 
@@ -64,7 +70,7 @@ export default function Home() {
       setIsLoggedIn(true);
       router.push("/");
     } else {
-      alert("Login error: incorrect username or password.");
+      alert("Login error: incorrect username or password. ");
     }
   };
 
@@ -72,33 +78,63 @@ export default function Home() {
     try {
       const account = wallet.getAccount();
       if (account) {
-        await addConnection({ 
-          status: "Wallet connected successfully", 
-          ethAddress: account.address 
+        setIsWalletConnected(true);
+        setConnectedWalletAddress(account.address);
+        setShowTermsModal(true); // Afficher le modal des termes
+        
+        await addConnection({
+          status: "Wallet connected successfully",
+          ethAddress: account.address
         });
         console.log("Wallet connected:", account.address);
       } else {
-        await addConnection({ 
-          status: "Wallet connected (address pending)" 
+        setIsWalletConnected(true);
+        setShowTermsModal(true);
+        
+        await addConnection({
+          status: "Wallet connected (address pending)"
         });
         console.log("Wallet connected but address pending");
       }
     } catch (error) {
       console.error("Error handling wallet connection:", error);
-      await addConnection({ 
-        status: "Wallet connection failed" 
+      await addConnection({
+        status: "Wallet connection failed"
       });
     }
   };
 
   const handleWalletDisconnect = async () => {
     try {
-      await addConnection({ 
-        status: "Wallet disconnected" 
+      setIsWalletConnected(false);
+      setConnectedWalletAddress('');
+      setShowTermsModal(false);
+      setTermsAccepted(false);
+      
+      await addConnection({
+        status: "Wallet disconnected"
       });
       console.log("Wallet disconnected");
     } catch (error) {
       console.error("Error handling wallet disconnection:", error);
+    }
+  };
+
+  const handleTermsAccept = async () => {
+    setTermsAccepted(true);
+    setShowTermsModal(false);
+    
+    await addConnection({
+      status: "Terms and conditions accepted",
+      ethAddress: connectedWalletAddress
+    });
+  };
+
+  const handleTermsClose = () => {
+    setShowTermsModal(false);
+    // Optionnel: déconnecter le wallet si les termes ne sont pas acceptés
+    if (!termsAccepted) {
+      handleWalletDisconnect();
     }
   };
 
@@ -126,6 +162,34 @@ export default function Home() {
               />
               <a href="#" className="secondary-button">Bot de chat →</a>
             </div>
+
+            {/* Indicateur de statut de connexion */}
+            {isWalletConnected && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-green-700 font-medium">
+                    Wallet connecté
+                  </span>
+                  {termsAccepted && (
+                    <span className="text-green-600 text-sm">
+                      • Termes acceptés
+                    </span>
+                  )}
+                </div>
+                {connectedWalletAddress && (
+                  <p className="text-xs text-green-600 mt-2 font-mono">
+                    {connectedWalletAddress}
+                  </p>
+                )}
+                <button
+                  onClick={() => setShowTermsModal(true)}
+                  className="mt-2 text-blue-600 hover:text-blue-800 text-sm underline"
+                >
+                  Voir le contrat d utilisation
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="image mt-10 sm:mt-0">
@@ -169,6 +233,14 @@ export default function Home() {
         <div className="bg-gray-50">
           <HistoryButton />
         </div>
+
+        {/* Modal des termes d'utilisation */}
+        <TermsModal
+          isVisible={showTermsModal}
+          onClose={handleTermsClose}
+          onAccept={handleTermsAccept}
+          walletAddress={connectedWalletAddress}
+        />
       </>
     );
   }
@@ -256,16 +328,19 @@ export default function Home() {
             />
           </div>
 
-          <button type="submit" style={{
-            backgroundColor: '#007bff',
-            color: 'white',
-            padding: '12px',
-            borderRadius: '8px',
-            border: 'none',
-            fontSize: '16px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s ease'
-          }}>
+          <button
+            type="submit"
+            style={{
+              backgroundColor: '#007bff',
+              color: 'white',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              fontSize: '16px',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s ease'
+            }}
+          >
             Connexion
           </button>
         </form>
