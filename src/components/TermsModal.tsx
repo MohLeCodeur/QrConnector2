@@ -13,20 +13,13 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [currentSection, setCurrentSection] = useState('overview');
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollTop + clientHeight >= scrollHeight - 10) {
-      setHasScrolledToBottom(true);
-    }
-  };
-
   if (!isVisible) return null;
 
   const sections = [
-    { id: 'overview', title: 'Vue d\'ensemble' },
+    { id: 'overview', title: 'Vue d&apos;ensemble' },
     { id: 'wallet', title: 'Connexion Wallet' },
     { id: 'compliance', title: 'Conformité AML/KYC' },
-    { id: 'terms', title: 'Conditions d\'utilisation' }
+    { id: 'terms', title: 'Conditions d&apos;utilisation' }
   ];
 
   const renderContent = () => {
@@ -126,7 +119,7 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
                 <h4 className="font-semibold text-gray-800 mb-2">⚖️ Conformité légale</h4>
                 <p className="text-sm text-gray-600">
                   Notre plateforme respecte les directives FATF, les réglementations européennes MiCA, 
-                  et les standards internationaux de lutte contre le blanchiment d'argent.
+                  et les standards internationaux de lutte contre le blanchiment d&apos;argent.
                 </p>
               </div>
             </div>
@@ -136,14 +129,14 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
       case 'terms':
         return (
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-blue-600 mb-4">Conditions d'utilisation</h3>
+            <h3 className="text-xl font-bold text-blue-600 mb-4">Conditions d&apos;utilisation</h3>
             <div className="space-y-4 text-sm text-gray-700">
               
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-gray-800 mb-2">1. Acceptation des conditions</h4>
                 <p>
                   En connectant votre wallet et en utilisant nos services, vous acceptez intégralement 
-                  les présentes conditions d'utilisation et notre politique de confidentialité.
+                  les présentes conditions d&apos;utilisation et notre politique de confidentialité.
                 </p>
               </div>
 
@@ -153,7 +146,7 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
                   <li>• Usage personnel et professionnel légal uniquement</li>
                   <li>• Interdiction de contourner nos mesures de sécurité</li>
                   <li>• Respect des lois locales et internationales</li>
-                  <li>• Pas d'utilisation pour des activités illégales</li>
+                  <li>• Pas d&apos;utilisation pour des activités illégales</li>
                 </ul>
               </div>
 
@@ -195,7 +188,7 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">Contrat d'utilisation</h2>
+            <h2 className="text-2xl font-bold">Contrat d&apos;utilisation</h2>
             <p className="text-blue-100 text-sm">AMLCheck - Plateforme de conformité</p>
           </div>
           <button
@@ -220,18 +213,14 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-600 hover:bg-gray-200'
                 }`}
-              >
-                <span>{section.title}</span>
-              </button>
+                dangerouslySetInnerHTML={{ __html: section.title }}
+              />
             ))}
           </div>
         </div>
 
         {/* Content */}
-        <div 
-          className="flex-1 overflow-y-auto p-6"
-          onScroll={handleScroll}
-        >
+        <div className="flex-1 overflow-y-auto p-6">
           {renderContent()}
         </div>
 
@@ -246,7 +235,7 @@ const TermsModal = ({ isVisible, onClose, onAccept, walletAddress }: TermsModalP
                 onChange={(e) => setHasScrolledToBottom(e.target.checked)}
               />
               <label htmlFor="terms-checkbox">
-                J'ai lu et j'accepte les conditions d'utilisation
+                J&apos;ai lu et j&apos;accepte les conditions d&apos;utilisation
               </label>
             </div>
             <div className="flex space-x-3">
