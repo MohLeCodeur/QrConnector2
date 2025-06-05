@@ -80,7 +80,6 @@ export default function Home() {
       if (account) {
         setIsWalletConnected(true);
         setConnectedWalletAddress(account.address);
-        setShowTermsModal(true); // Afficher le modal des termes
         
         await addConnection({
           status: "Wallet connected successfully",
@@ -89,7 +88,6 @@ export default function Home() {
         console.log("Wallet connected:", account.address);
       } else {
         setIsWalletConnected(true);
-        setShowTermsModal(true);
         
         await addConnection({
           status: "Wallet connected (address pending)"
@@ -132,7 +130,6 @@ export default function Home() {
 
   const handleTermsClose = () => {
     setShowTermsModal(false);
-    // Optionnel: déconnecter le wallet si les termes ne sont pas acceptés
     if (!termsAccepted) {
       handleWalletDisconnect();
     }
@@ -186,7 +183,7 @@ export default function Home() {
                   onClick={() => setShowTermsModal(true)}
                   className="mt-2 text-blue-600 hover:text-blue-800 text-sm underline"
                 >
-                  Voir le contrat d utilisation
+                  Voir le contrat d&apos;utilisation
                 </button>
               </div>
             )}
