@@ -66,7 +66,7 @@ export default function Home() {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (username === "aml" && password === "fanta") {
+    if (username === "aml" && password === "miami") {
       setIsLoggedIn(true);
       router.push("/");
     } else {
